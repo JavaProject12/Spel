@@ -11,6 +11,10 @@ import java.awt.event.KeyEvent;
 
 public class VeerPanel extends JPanel implements KeyListener {
 	
+	int beginposx = 200;
+	int beginposy = 500;		
+	VeerSys pos = new VeerSys(beginposx, beginposy);
+	
 	public VeerPanel() {
 		
 		Timer t = new Timer();
@@ -54,13 +58,6 @@ public class VeerPanel extends JPanel implements KeyListener {
 		}
 		
 	}
-	
-	int beginposx = 200;
-	int beginposy = 500;
-	
-	
-	
-	VeerSys pos = new VeerSys(beginposx, beginposy);
 
 	public static void main(String[] args) {
 		JFrame f = new JFrame();
