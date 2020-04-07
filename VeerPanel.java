@@ -1,5 +1,6 @@
+package maart30;
 
-
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyListener;
 import java.util.Timer;
@@ -11,14 +12,12 @@ import java.awt.event.KeyEvent;
 
 public class VeerPanel extends JPanel implements KeyListener {
 	
-	int beginposx = 200;
-	int beginposy = 500;		
-	VeerSys pos = new VeerSys(beginposx, beginposy);
+	
 	
 	public VeerPanel() {
 		
 		Timer t = new Timer();
-		t.scheduleAtFixedRate(new UpdateTimerTask(), 5000, 20);
+		t.scheduleAtFixedRate(new UpdateTimerTask(),0, 20);
 		this.addKeyListener(this);
 		
 		
@@ -32,33 +31,62 @@ public class VeerPanel extends JPanel implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+		if(e.getKeyCode() == KeyEvent.VK_LEFT) {	
+				
+			pos.posChange(0, 0, 0.1);
 			
-			pos.posChange(0, 0, 0.5);
-			repaint();
 			
 		}
 		
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			
+			pos.posChange(0, 0, -0.1);
+		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_R) {
 			pos.posChange(10,0 , 0);
+			structChange(10,0);
 			repaint();
 		}
-		if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+		if(e.getKeyCode() == KeyEvent.VK_L) {
 			pos.posChange(-10,0 , 0);
+			structChange(-10,0);
 			repaint();
 			
 		}
-		if(e.getKeyCode() == KeyEvent.VK_UP) {
-			pos.posChange(0,-10 , 0);
+		if(e.getKeyCode() == KeyEvent.VK_U) {
+			pos.posChange(0,10 , 0);
+			structChange(0,10);
 			repaint();
 		}
-		if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-			pos.posChange(0,10 , 0);
+		if(e.getKeyCode() == KeyEvent.VK_D) {
+			pos.posChange(0,-10 , 0);
+			structChange(0, -10);
+			
 			repaint();
+		}
+		if(e.getKeyCode() == KeyEvent.VK_ENTER & opgespannen <= 5) {
+			opgespannen += 1;
+			pos.snelh += 0.1;
+			pos.posChange((int) (-7*Math.cos(pos.hoek)),(int)(-7*Math.sin(pos.hoek)), 0);
+			
+			
 		}
 		
+		
 	}
-
+	
+	
+	int opgespannen = 0;
+	int yposstruct = 500;
+	int xposstruct = 200;
+	VeerSys pos = new VeerSys(xposstruct, yposstruct);
+	
+	public void structChange(int x, int y) {
+		xposstruct += x;
+		yposstruct -= y;
+	}
+	
 	public static void main(String[] args) {
 		JFrame f = new JFrame();
         f.setSize(750,750);
@@ -68,6 +96,8 @@ public class VeerPanel extends JPanel implements KeyListener {
         JPanel hoofdpaneel = new VeerPanel();
         f.add(hoofdpaneel);
         f.setVisible(true);
+        
+        
        
         
 	}
@@ -76,8 +106,27 @@ public class VeerPanel extends JPanel implements KeyListener {
 		
         super.paintComponent(g);
         
-    	g.fillOval(pos.xpos, pos.ypos, 15, 15);
-     
+        g.setColor(Color.black);
+    	g.fillOval(pos.xposbal, pos.yposbal, 15, 15);
+    	
+    	if(pos.start == 0) {
+    		
+    		g.setColor(Color.red);
+    		g.drawLine( pos.xposbal + 8 + (int) (20*Math.cos(pos.hoek)), pos.yposbal + 8 - (int) (20*Math.sin(pos.hoek)), pos.xposbal + 8 + (int) (50*Math.cos(pos.hoek)), pos.yposbal + 8 - (int) (50*Math.sin(pos.hoek)));
+    		
+    		g.setColor(Color.blue);
+    		g.drawLine(xposstruct - 50, yposstruct + 15, pos.xposbal + 7, pos.yposbal + 15);
+    		g.drawLine(xposstruct + 65, yposstruct + 15, pos.xposbal + 8, pos.yposbal + 15);
+    	} else {
+    		g.setColor(Color.blue);
+    		g.drawLine(xposstruct - 50, yposstruct + 15, xposstruct + 65, yposstruct + 15);
+    	}
+    	
+    	
+    	
+    		
+    	
+    	
     }
 	
 	
@@ -88,7 +137,6 @@ public class VeerPanel extends JPanel implements KeyListener {
 		@Override
 		public void run() {
 			pos.update();
-			System.out.println(pos);
 			repaint();
 			
 		}
@@ -97,8 +145,10 @@ public class VeerPanel extends JPanel implements KeyListener {
 
 
 	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+	public void keyReleased(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			pos.startstop();
+		}
 		
 	}
 	@Override
