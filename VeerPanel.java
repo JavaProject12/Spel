@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.event.KeyEvent;
-//https://stackoverflow.com/questions/299495/how-to-add-an-image-to-a-jpanel
+
 public class VeerPanel extends JPanel implements KeyListener {
 	
 
@@ -25,7 +25,7 @@ public class VeerPanel extends JPanel implements KeyListener {
 		this.addKeyListener(this);		
 	}	
 	
-	public void reset() {
+	public void reset() { //resets bow and arrow to initial state 
 		pos.tijd = 0;
 		pos.xposbal = xposstruct;
 		pos.yposbal = yposstruct;
@@ -44,38 +44,46 @@ public class VeerPanel extends JPanel implements KeyListener {
 		}
 	
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e) { // pressing LEFT and RIGHT changes the initial angle of bow and arrow
 
-		if(e.getKeyCode() == KeyEvent.VK_LEFT) {	
+		if(e.getKeyCode() == KeyEvent.VK_LEFT & opgespannen == 0) {	
 				
 			pos.posChange(0, 0, 0.1);
 			booghoek += 0.1;	
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+		if(e.getKeyCode() == KeyEvent.VK_RIGHT & opgespannen == 0) {
 			
 			pos.posChange(0, 0, -0.1);
 			booghoek -= 0.1;
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_SPACE & opgespannen <= 5) {
+		if(e.getKeyCode() == KeyEvent.VK_SPACE & opgespannen <= 5) { //keep the spacebar pressed to pull the arrow
 			opgespannen += 1;
 			pos.snelh += 0.1;
 			pos.posChange((int) (-7*Math.cos(pos.hoek)),(int)(-7*Math.sin(pos.hoek)), 0);					
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {// pressing enter resets the bow and arrow
 			reset();
 		}
-	}	
-	int opgespannen = 0;
-	double booghoek = 0; 
-	int yposstruct = 500;
-	int xposstruct = 200;
-	VeerSys pos = new VeerSys(xposstruct, yposstruct);
-	VeerDoel doel = new VeerDoel(375, 375);
+	}
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
+		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+			pos.startstop(); //fires the arrow when the spacebar is released
+
+		}	
+	}
+	int opgespannen = 0; // keeps track of how far the arrow has been pulled
+	double booghoek = 0; // sets initial angle of bow to 0
+	int yposstruct = 500; 
+	int xposstruct = 200; // coordinates of the bow
+	VeerSys pos = new VeerSys(xposstruct, yposstruct); // puts arrow in the same position as the bow
+	VeerDoel doel = new VeerDoel(375, 375); // places angle at the given position
 	
-	public void structChange(int x, int y) {
+	public void structChange(int x, int y) { //(unused) allows you to change the position of the bow
 		xposstruct += x;
 		yposstruct -= y;
 	}
@@ -95,17 +103,21 @@ public class VeerPanel extends JPanel implements KeyListener {
 		
         super.paintComponent(g);
         
+        g.setColor(Color.green);
+        
+        g.fillRect(0, yposstruct + 30 , 750, 750); // draws ground (always right under bow)
+        
         g.setColor(Color.black);
         
         
 
     	
-    	g.drawArc(xposstruct - 30, yposstruct - 30, 60, 60, (int) (booghoek/Math.PI * 180), 180);
+    	g.drawArc(xposstruct - 30, yposstruct - 30, 60, 60, (int) (booghoek/Math.PI * 180), 180); //draws bow
     	
-    	g.drawOval(doel.xposdoel - 15, doel.yposdoel -15, 30, 30);
+    	g.drawOval(doel.xposdoel - 15, doel.yposdoel -15, 30, 30); //draws target
     
     	if(pos.xposbal >= doel.xposdoel - 15 & pos.xposbal <= doel.xposdoel + 15 & pos.yposbal <= doel.yposdoel + 15 & pos.yposbal >= doel.yposdoel - 15) {
-    		
+    		//displays the string 'win!' when the arrow touches the target
     		pos.geraakt();
 			g.drawString("win!",100, 100);
 		}
@@ -117,10 +129,10 @@ public class VeerPanel extends JPanel implements KeyListener {
     		g.drawLine(pos.xposbal,
     				   pos.yposbal, 
     				   pos.xposbal+ (int) (30*Math.cos(pos.hoek)), 
-    				   pos.yposbal- (int) (30*Math.sin(pos.hoek)));
+    				   pos.yposbal- (int) (30*Math.sin(pos.hoek))); //draws arrow while not fired (attached to string)
     		g.setColor(Color.blue);
-    		g.drawLine((int) (xposstruct - 30*Math.cos(booghoek)),(int) (yposstruct + 30*Math.sin(booghoek)), pos.xposbal, pos.yposbal);
-    		g.drawLine((int) (xposstruct + 30*Math.cos(booghoek)),(int) (yposstruct - 30*Math.sin(booghoek)), pos.xposbal, pos.yposbal);
+    		g.drawLine((int) (xposstruct - 30*Math.cos(booghoek)),(int) (yposstruct + 30*Math.sin(booghoek)), pos.xposbal, pos.yposbal); // draws the string of the bow (attached to arrow when not fired)
+    		g.drawLine((int) (xposstruct + 30*Math.cos(booghoek)),(int) (yposstruct - 30*Math.sin(booghoek)), pos.xposbal, pos.yposbal);// ^
 
     	} else {
     		
@@ -128,13 +140,13 @@ public class VeerPanel extends JPanel implements KeyListener {
     		g.drawLine((int) (xposstruct - 30*Math.cos(booghoek)),
     				   (int) (yposstruct + 30*Math.sin(booghoek)),
     				   (int) (xposstruct + 30*Math.cos(booghoek)),
-    				   (int) (yposstruct - 30*Math.sin(booghoek)));
+    				   (int) (yposstruct - 30*Math.sin(booghoek))); //draws the string of the bow when the arrow has been fired (arrow not attached to string)
     		
     		g.setColor(Color.red);
     		g.drawLine((int) (pos.xposbal - 15* Math.cos(pos.raakhoek)),
     				   (int) (pos.yposbal - 15* Math.sin(pos.raakhoek)), 
     				   (int) (pos.xposbal + 15* Math.cos(pos.raakhoek)), 
-    				   (int) (pos.yposbal + 15* Math.sin(pos.raakhoek)));
+    				   (int) (pos.yposbal + 15* Math.sin(pos.raakhoek))); //draws the arrow when it has been fired
     	}  
     }
 	class UpdateTimerTask extends TimerTask {
@@ -142,17 +154,10 @@ public class VeerPanel extends JPanel implements KeyListener {
 		@Override
 		public void run() {
 			pos.update();
-			repaint();			
+			repaint(); 			
 		}
 	}
-	@Override
-	public void keyReleased(KeyEvent e) {
-		
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-			pos.startstop();
 
-		}	
-	}
 	@Override
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub

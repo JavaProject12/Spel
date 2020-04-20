@@ -1,18 +1,14 @@
 package maart30;
 
-public class VeerDoel {
+public class VeerDoel { //keeps the position of the target
 	
 	int xposdoel, yposdoel;
-	int geraakt;
+
 
 	public VeerDoel(int xposdoel, int yposdoel) {
 		this.xposdoel = xposdoel;
 		this.yposdoel = yposdoel;
 	}
 	
-	public void geraakt() {
-		geraakt = 1;
-		
-	}
 
 }
