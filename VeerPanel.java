@@ -16,7 +16,7 @@ import java.awt.event.KeyEvent;
 
 public class VeerPanel extends JPanel implements KeyListener {
 	
-
+	
 	
 	public VeerPanel() {
 		
@@ -35,6 +35,20 @@ public class VeerPanel extends JPanel implements KeyListener {
 		pos.snelh = 0.2;
 		booghoek = 0;
 		pos.geraakt = 0;
+		geraakt = 0;
+		
+	}
+	
+	public void levelSet() {
+		if( level == 1) {
+			xposstruct = 300;
+			yposstruct = 300;
+		}
+		if (level == 2) {
+			xposstruct = 100;
+			yposstruct = 600;
+		}
+		
 	}
 	
 	@Override 
@@ -64,8 +78,15 @@ public class VeerPanel extends JPanel implements KeyListener {
 			pos.posChange((int) (-7*Math.cos(pos.hoek)),(int)(-7*Math.sin(pos.hoek)), 0);					
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_ENTER) {// pressing enter resets the bow and arrow
+		if(e.getKeyCode() == KeyEvent.VK_ENTER & geraakt == 0) {// pressing enter resets the bow and arrow
 			reset();
+		}
+		if(e.getKeyCode() == KeyEvent.VK_ENTER & geraakt == 1) {
+			level += 1;
+			levelSet();
+			reset();
+			System.out.println("l");
+			
 		}
 	}
 	@Override
@@ -76,30 +97,44 @@ public class VeerPanel extends JPanel implements KeyListener {
 
 		}	
 	}
+	
+	
 	int opgespannen = 0; // keeps track of how far the arrow has been pulled
 	double booghoek = 0; // sets initial angle of bow to 0
-	int yposstruct = 500; 
-	int xposstruct = 200; // coordinates of the bow
+	static int yposstruct = 300; 
+	static int xposstruct = 300; // coordinates of the bow
+	
 	VeerSys pos = new VeerSys(xposstruct, yposstruct); // puts arrow in the same position as the bow
 	VeerDoel doel = new VeerDoel(375, 375); // places angle at the given position
-	
+	static int level = 1;
+	static int geraakt = 0;
+
 	public void structChange(int x, int y) { //(unused) allows you to change the position of the bow
 		xposstruct += x;
 		yposstruct -= y;
 	}
 	
 	public static void main(String[] args) {
-		JFrame f = new JFrame();
-        f.setSize(750,750);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setTitle("Project");
-        f.setLocation(100, 100); //standaard in de hoek van het scherm
-        JPanel hoofdpaneel = new VeerPanel();
-        f.add(hoofdpaneel);
-        f.setVisible(true);     
+		
+			JFrame f = new JFrame();
+	        f.setSize(750,750);
+	        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        f.setTitle("Project");
+	        f.setLocation(100, 100); //standaard in de hoek van het scherm
+	        JPanel hoofdpaneel = new VeerPanel();
+	        f.add(hoofdpaneel);
+	        f.setVisible(true);
+	  	     
 	}
 	
-	public void paintComponent(Graphics g) {		
+		
+		
+		
+	
+	
+	public void paintComponent(Graphics g) {	
+
+		
 		
         super.paintComponent(g);
         
@@ -109,6 +144,7 @@ public class VeerPanel extends JPanel implements KeyListener {
         
         g.setColor(Color.black);
         
+ 
         
 
     	
@@ -116,11 +152,22 @@ public class VeerPanel extends JPanel implements KeyListener {
     	
     	g.drawOval(doel.xposdoel - 15, doel.yposdoel -15, 30, 30); //draws target
     
-    	if(pos.xposbal >= doel.xposdoel - 15 & pos.xposbal <= doel.xposdoel + 15 & pos.yposbal <= doel.yposdoel + 15 & pos.yposbal >= doel.yposdoel - 15) {
+    	if(pos.xposbal + 15* Math.cos(pos.raakhoek) >= doel.xposdoel - 15 
+    			& pos.xposbal + 15* Math.cos(pos.raakhoek) <= doel.xposdoel + 15
+    			& pos.yposbal - 15* Math.sin(pos.raakhoek) <= doel.yposdoel + 15 
+    			& pos.yposbal - 15* Math.sin(pos.raakhoek) >= doel.yposdoel - 15) {
     		//displays the string 'win!' when the arrow touches the target
+    		geraakt = 1;
+    		doel.geraakt = 1;
     		pos.geraakt();
-			g.drawString("win!",100, 100);
+			g.drawString("win! press enter to continue",100, 100);
 		}
+    	
+    	if(level == 1) {
+    		g.drawString("Level 1", 200, 200);
+    	} else {
+    		g.drawString("Level 2", 200, 200);
+    	}
     	
     	if(pos.start == 0) {
     		
@@ -154,6 +201,7 @@ public class VeerPanel extends JPanel implements KeyListener {
 		@Override
 		public void run() {
 			pos.update();
+			doel.updateDoel();
 			repaint(); 			
 		}
 	}

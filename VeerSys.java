@@ -3,8 +3,8 @@ package maart30;
 
 public class VeerSys {
 
-	int beginxpos, beginypos; // starting position of the arrow
-	int xposbal, yposbal; // position of the arrow (at rest or while moving)
+	static int beginxpos, beginypos; // starting position of the arrow
+	static int xposbal, yposbal; // position of the arrow (at rest or while moving)
 	double snelh = 0.2; // initial speed of the arrow
 	int tijd = 0; //time
 	double hoek = Math.PI/2; // initial angle of the arrow
@@ -21,6 +21,10 @@ public class VeerSys {
 
 	
 	double raakhoek; //angle of slope m
+	
+
+
+    
 	
 
 	
@@ -69,9 +73,9 @@ public class VeerSys {
 			pos2x = xposbal;
 			pos2y = yposbal;// after updating the position
 			
-			m = (pos2y - pos1y)/(pos2x - pos1x); // (delta y)/(delta x)
+			m = ( pos2y - pos1y)/ (pos2x - pos1x); // (delta y)/(delta x)
 			raakhoek = Math.atan(m);
-			
+			;
 		}
 		
 		
