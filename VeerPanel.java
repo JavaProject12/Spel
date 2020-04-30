@@ -40,14 +40,16 @@ public class VeerPanel extends JPanel implements KeyListener {
 	}
 	
 	public void levelSet() {
-		if( level == 1) {
-			xposstruct = 300;
-			yposstruct = 300;
-		}
-		if (level == 2) {
-			xposstruct = 100;
-			yposstruct = 600;
-		}
+		lev.Level(level);
+		xposstruct = lev.xposbal;
+		yposstruct = lev.yposbal;
+		xposdoel = lev.xposdoel;
+		yposdoel = lev.yposdoel;
+		snelheid = lev.snelheid;
+		beginxposdoel = xposdoel;
+		beginyposdoel = yposdoel;
+		
+		
 		
 	}
 	
@@ -60,40 +62,59 @@ public class VeerPanel extends JPanel implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) { // pressing LEFT and RIGHT changes the initial angle of bow and arrow
 
-		if(e.getKeyCode() == KeyEvent.VK_LEFT & opgespannen == 0) {	
+		if(e.getKeyCode() == KeyEvent.VK_LEFT & opgespannen == 0 & levens > 0) {	
 				
 			pos.posChange(0, 0, 0.1);
 			booghoek += 0.1;	
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_RIGHT & opgespannen == 0) {
+		if(e.getKeyCode() == KeyEvent.VK_RIGHT & opgespannen == 0 & levens > 0) {
 			
 			pos.posChange(0, 0, -0.1);
 			booghoek -= 0.1;
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_SPACE & opgespannen <= 5) { //keep the spacebar pressed to pull the arrow
+		if(e.getKeyCode() == KeyEvent.VK_SPACE & opgespannen <= 5 & levens > 0) { //keep the spacebar pressed to pull the arrow
 			opgespannen += 1;
 			pos.snelh += 0.1;
 			pos.posChange((int) (-7*Math.cos(pos.hoek)),(int)(-7*Math.sin(pos.hoek)), 0);					
 		}
 		
-		if(e.getKeyCode() == KeyEvent.VK_ENTER & geraakt == 0) {// pressing enter resets the bow and arrow
+		if(e.getKeyCode() == KeyEvent.VK_ENTER & geraakt == 0 & gameover == 0) {// pressing enter resets the bow and arrow
 			reset();
 		}
 		if(e.getKeyCode() == KeyEvent.VK_ENTER & geraakt == 1) {
 			level += 1;
 			levelSet();
 			reset();
+			levens = 5;
 			System.out.println("l");
 			
 		}
+		if(e.getKeyCode() == KeyEvent.VK_ENTER & gameover == 1) {
+			level = 1;
+			levelSet();
+			reset();
+			levens = 5;
+			gameover = 0;
+			System.out.println("l");
+			
+		}
+		if(e.getKeyCode() == KeyEvent.VK_ENTER & geraakt == 0 & levens == 0) {// pressing enter resets the bow and arrow
+			gameover = 1;
+		}
+		
+		
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
 		
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-			pos.startstop(); //fires the arrow when the spacebar is released
+		if(e.getKeyCode() == KeyEvent.VK_SPACE & levens > 0) {
+			 //fires the arrow when the spacebar is released
+			if(pos.start == 0) {
+				levens -= 1;
+			}
+			pos.startstop();
 
 		}	
 	}
@@ -103,11 +124,19 @@ public class VeerPanel extends JPanel implements KeyListener {
 	double booghoek = 0; // sets initial angle of bow to 0
 	static int yposstruct = 300; 
 	static int xposstruct = 300; // coordinates of the bow
-	
+	static int xposdoel = 500;
+	static int yposdoel = 500;
+	int beginxposdoel = xposdoel;
+	int beginyposdoel = yposdoel;
+	static int snelheid = 0;
 	VeerSys pos = new VeerSys(xposstruct, yposstruct); // puts arrow in the same position as the bow
 	VeerDoel doel = new VeerDoel(375, 375); // places angle at the given position
 	static int level = 1;
 	static int geraakt = 0;
+	LevelData lev = new LevelData();
+	int levens = 5;
+	int gameover = 0;
+	
 
 	public void structChange(int x, int y) { //(unused) allows you to change the position of the bow
 		xposstruct += x;
@@ -115,7 +144,7 @@ public class VeerPanel extends JPanel implements KeyListener {
 	}
 	
 	public static void main(String[] args) {
-		
+			
 			JFrame f = new JFrame();
 	        f.setSize(750,750);
 	        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -124,10 +153,24 @@ public class VeerPanel extends JPanel implements KeyListener {
 	        JPanel hoofdpaneel = new VeerPanel();
 	        f.add(hoofdpaneel);
 	        f.setVisible(true);
+    
+	        
+	        
 	  	     
 	}
 	
+	
+	public void updateDoel() {
 		
+		if(geraakt == 0) {
+			xposdoel += snelheid;
+			if(xposdoel >= beginxposdoel + 50 | xposdoel <= beginxposdoel - 50) {
+				snelheid *= -1;
+			}
+			
+		}
+		
+	}
 		
 		
 	
@@ -138,36 +181,45 @@ public class VeerPanel extends JPanel implements KeyListener {
 		
         super.paintComponent(g);
         
-        g.setColor(Color.green);
+       
         
-        g.fillRect(0, yposstruct + 30 , 750, 750); // draws ground (always right under bow)
-        
-        g.setColor(Color.black);
-        
+       
+        g.setColor(Color.red);
  
-        
+        for(int i = 0; i < levens; i++) {
+        	g.fillOval(50+ 25*i, 55,20 , 20);
+        }
 
-    	
+    	 g.setColor(Color.black);
+    	 if(levens == 0 & (pos.xposbal > 750  | pos.xposbal < 0| pos.yposbal > 750)) {
+    		 
+    		 gameover = 1;
+    	 }
+    	 if(gameover == 1) {
+    		 g.drawString("GAME OVER", 350, 350);
+    	 }
     	g.drawArc(xposstruct - 30, yposstruct - 30, 60, 60, (int) (booghoek/Math.PI * 180), 180); //draws bow
     	
-    	g.drawOval(doel.xposdoel - 15, doel.yposdoel -15, 30, 30); //draws target
-    
-    	if(pos.xposbal + 15* Math.cos(pos.raakhoek) >= doel.xposdoel - 15 
-    			& pos.xposbal + 15* Math.cos(pos.raakhoek) <= doel.xposdoel + 15
-    			& pos.yposbal - 15* Math.sin(pos.raakhoek) <= doel.yposdoel + 15 
-    			& pos.yposbal - 15* Math.sin(pos.raakhoek) >= doel.yposdoel - 15) {
+    	g.fillOval(xposdoel - 15, yposdoel -15, 30, 30); //draws target
+    	g.setColor(Color.blue);
+    	g.fillOval(xposdoel - 12, yposdoel -12, 25, 25);
+    	g.setColor(Color.red);
+    	g.fillOval(xposdoel - 10, yposdoel -10, 20, 20);
+    	g.setColor(Color.yellow);
+    	g.fillOval(xposdoel - 2, yposdoel -2, 5, 5);
+    	g.setColor(Color.black);
+    	if(pos.xposbal + 15* Math.cos(pos.raakhoek) >= xposdoel - 15 
+    			& pos.xposbal + 15* Math.cos(pos.raakhoek) <= xposdoel + 15
+    			& pos.yposbal - 15* Math.sin(pos.raakhoek) <= yposdoel + 15 
+    			& pos.yposbal - 15* Math.sin(pos.raakhoek) >= yposdoel - 15) {
     		//displays the string 'win!' when the arrow touches the target
     		geraakt = 1;
     		doel.geraakt = 1;
     		pos.geraakt();
-			g.drawString("win! press enter to continue",100, 100);
+			g.drawString("Target hit! Press enter to continue",100, 100);
 		}
     	
-    	if(level == 1) {
-    		g.drawString("Level 1", 200, 200);
-    	} else {
-    		g.drawString("Level 2", 200, 200);
-    	}
+    	g.drawString("Level " + Integer.toString(level), 50, 50);
     	
     	if(pos.start == 0) {
     		
@@ -201,8 +253,11 @@ public class VeerPanel extends JPanel implements KeyListener {
 		@Override
 		public void run() {
 			pos.update();
-			doel.updateDoel();
-			repaint(); 			
+			updateDoel();
+			repaint(); 
+			
+			
+			
 		}
 	}
 
