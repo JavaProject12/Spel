@@ -19,6 +19,7 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -26,18 +27,26 @@ import javax.swing.JPanel;
 import java.awt.event.KeyEvent;
 
 public class ArrowPanel extends JPanel implements KeyListener {
-
+   
 	Level level;
+	JFrame f;
 	
 	
-	public ArrowPanel(int l) {
+	
 		
-    
+	public ArrowPanel(int l, JFrame frame) {
 		
+		
+		f = frame;
 		this.addKeyListener(this);	
 		level = new Level(l);
+		
+		
+		
 		Timer t = new Timer();
 		t.scheduleAtFixedRate(new UpdateTimerTask(),0, 20);
+		
+		
 	}	
 
 	@Override 
@@ -62,12 +71,18 @@ public class ArrowPanel extends JPanel implements KeyListener {
 			}
 		}
 		
+		
+		
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			
 			if(level.target.TargetHit == true) {
+				level.score += level.arrow.lives *5;
 				level.inLevel += 1;
 				level.LevelSet();
+				
 			}
+			
+			
 			if(level.target.TargetHit == false) {
 				level.arrow.toInitial();
 			}
@@ -89,13 +104,19 @@ public class ArrowPanel extends JPanel implements KeyListener {
 		
 	}
 	
-	public void paintComponent(Graphics g) {	
-	
+	public void paintComponent(Graphics g) {
+		
         super.paintComponent(g);
        
-        level.drawLevel(g);
+       level.drawLevel(g);
+       
+       level.target.draw(g);
+       level.arrow.draw(g);
        
 	}
+
+	
+	
 	
         
 	class UpdateTimerTask extends TimerTask {
@@ -115,4 +136,6 @@ public class ArrowPanel extends JPanel implements KeyListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 }

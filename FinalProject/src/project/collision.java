@@ -10,10 +10,10 @@ public class collision {
 	}
 	public boolean Check() {
 		
-		if(arrow.ArrowTipX <= target.TargetX + 15 
-				& arrow.ArrowTipY <= target.TargetY + 15 
-				& arrow.ArrowTipX >= target.TargetX - 15
-				& arrow.ArrowTipY >= target.TargetY - 15) {
+		if(arrow.ArrowTipX <= target.TargetX + 25 
+				& arrow.ArrowTipY <= target.TargetY + 25 
+				& arrow.ArrowTipX >= target.TargetX - 25
+				& arrow.ArrowTipY >= target.TargetY - 25) {
 			arrow.moving = false;
 			target.TargetHit = true;
 			return true;
