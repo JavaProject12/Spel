@@ -1,4 +1,4 @@
-package project;
+package spring;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -39,6 +39,9 @@ public class MainFrame extends JFrame {
 	JButton b;
 	Image background = Toolkit.getDefaultToolkit().getImage("src/images/Cylinders.jpg");
 	JLabel l;
+	JLabel text;
+	JLabel lev;
+	JLabel inst;
 	public MainFrame()  {
 		
 		this.setSize(1300, 650);
@@ -51,13 +54,34 @@ public class MainFrame extends JFrame {
 		p = new JPanel();
 		p.setLayout(null);
 		p.setBackground(Color.LIGHT_GRAY);
+		text= new JLabel("Welcome dear player!To play Arrow, click on the start button.");
+		lev= new JLabel("You start with the first level, you have got five chances for each level. \n" + 
+				"All levels have different environments. Want to discover them? Start playing now!\n");
+		inst = new JLabel("Press the right and left arrows of your keyboard to rotate the arrow\n" + 
+				"Press the space bar to clamp the arrow\n" + 
+				"Release the space bar to make the arrow hit its target.\n" + 
+				"\n" + 
+				"Have a good game!\n" + 
+				" ");
 		
+
 		b = new JButton("Start");
 		l = new JLabel("Arrow");
 		l.setFont(new Font("Verdana", Font.PLAIN, 18));
 		l.setBounds(600, 200, 100, 20);
+		text.setFont(new Font("Arial",Font.PLAIN, 15));
+		lev.setFont(new Font("Arial",Font.PLAIN, 13));
+		inst.setFont(new Font("Arial",Font.PLAIN, 13));
+		lev.setForeground(Color.CYAN);
+		inst.setForeground(Color.CYAN);
 		p.add(l);
+		p.add(text);
+		p.add(inst);
+		p.add(lev);
 		b.setBounds(600,315,100, 20);
+		text.setBounds(450,450,550,50);
+		lev.setBounds(100,500,1500,10);
+		inst.setBounds(100,500,1500,60);
 		
 		b.addActionListener(new ActionListener()
 	    {
